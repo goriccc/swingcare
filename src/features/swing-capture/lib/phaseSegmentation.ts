@@ -19,11 +19,20 @@ import { LANDMARK_INDEX } from './landmarkTypes';
  */
 export const DEFAULT_TRAIL_WRIST_INDEX = LANDMARK_INDEX.right_wrist;
 
-/** finish: 이 속도(정규화 좌표/프레임) 이하가 N프레임 유지되면 종료로 간주 */
-export const FINISH_VELOCITY_THRESHOLD = 0.012;
+/** finish: 절대 하한 (정규화 좌표/프레임). 지터보다 약간 위 */
+export const FINISH_VELOCITY_FLOOR = 0.025;
+
+/**
+ * finish: impact 피크 속도 대비 비율.
+ * 고정 임계값(0.012)은 실기기 지터에 막혀 거의 항상 폴백됐음.
+ */
+export const FINISH_VELOCITY_PEAK_RATIO = 0.22;
 
 /** finish 안정 프레임 수 */
-export const FINISH_STABLE_FRAME_COUNT = 5;
+export const FINISH_STABLE_FRAME_COUNT = 3;
+
+/** soft finish: impact 이후 이 비율만큼 지난 뒤부터 최저 속도 구간 탐색 */
+export const FINISH_SOFT_SEARCH_START_RATIO = 0.25;
 
 /** top 탐지 시 address 직후 스킵할 최소 프레임 (노이즈) */
 export const TOP_SEARCH_MIN_OFFSET_FRAMES = 3;
@@ -34,7 +43,9 @@ export const IMPACT_SEARCH_MIN_OFFSET_FRAMES = 2;
 export interface SegmentSwingPhasesOptions {
   /** 기본 right_wrist(16). 좌타 등이면 left_wrist 등으로 교체 */
   trailWristIndex?: number;
+  /** @deprecated 절대 임계 대신 peak ratio 사용. 호환용 하한으로만 씀 */
   finishVelocityThreshold?: number;
+  finishVelocityPeakRatio?: number;
   finishStableFrameCount?: number;
 }
 
@@ -136,8 +147,10 @@ export function segmentSwingPhases(
   options: SegmentSwingPhasesOptions = {},
 ): SegmentSwingPhasesResult {
   const trailWristIndex = options.trailWristIndex ?? DEFAULT_TRAIL_WRIST_INDEX;
-  const finishVelocityThreshold =
-    options.finishVelocityThreshold ?? FINISH_VELOCITY_THRESHOLD;
+  const finishVelocityFloor =
+    options.finishVelocityThreshold ?? FINISH_VELOCITY_FLOOR;
+  const finishVelocityPeakRatio =
+    options.finishVelocityPeakRatio ?? FINISH_VELOCITY_PEAK_RATIO;
   const finishStableFrameCount =
     options.finishStableFrameCount ?? FINISH_STABLE_FRAME_COUNT;
 
@@ -192,25 +205,63 @@ export function segmentSwingPhases(
       frames.length - 1,
       Math.max(topIndex + 1, Math.floor(frames.length * 0.55)),
     );
+    maxVelocity = 0;
   }
 
-  // 4) finish = impact 이후 속도가 임계값 이하로 N프레임 유지
+  // 4) finish = impact 이후 속도가 (피크 대비 상대 임계) 이하로 N프레임 유지
+  const finishVelocityThreshold = Math.max(
+    finishVelocityFloor,
+    maxVelocity * finishVelocityPeakRatio,
+  );
   let finishIndex = frames.length - 1;
   let stableCount = 0;
-  let foundFinish = false;
+  let foundFinish: 'threshold' | 'soft' | null = null;
   for (let i = Math.max(1, impactIndex + 1); i < frames.length; i += 1) {
     const velocity = frameVelocity(frames[i - 1], frames[i], trailWristIndex);
     if (velocity <= finishVelocityThreshold) {
       stableCount += 1;
       if (stableCount >= finishStableFrameCount) {
         finishIndex = i;
-        foundFinish = true;
+        foundFinish = 'threshold';
         break;
       }
     } else {
       stableCount = 0;
     }
   }
+
+  // soft: 임계에 못 미치면 impact 이후 후반부에서 가장 조용한 지점
+  if (!foundFinish && frames.length > impactIndex + 3) {
+    const searchStart = Math.min(
+      frames.length - 1,
+      impactIndex +
+        Math.max(
+          2,
+          Math.floor(
+            (frames.length - 1 - impactIndex) * FINISH_SOFT_SEARCH_START_RATIO,
+          ),
+        ),
+    );
+    let quietestIndex = frames.length - 1;
+    let quietestScore = Number.POSITIVE_INFINITY;
+    for (let i = searchStart; i < frames.length; i += 1) {
+      const windowStart = Math.max(1, i - finishStableFrameCount + 1);
+      let sum = 0;
+      let count = 0;
+      for (let j = windowStart; j <= i; j += 1) {
+        sum += frameVelocity(frames[j - 1], frames[j], trailWristIndex);
+        count += 1;
+      }
+      const avg = count > 0 ? sum / count : Number.POSITIVE_INFINITY;
+      if (avg < quietestScore) {
+        quietestScore = avg;
+        quietestIndex = i;
+      }
+    }
+    finishIndex = quietestIndex;
+    foundFinish = 'soft';
+  }
+
   if (!foundFinish) {
     finishIndex = frames.length - 1;
   }
