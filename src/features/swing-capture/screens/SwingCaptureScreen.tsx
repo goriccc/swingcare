@@ -197,7 +197,11 @@ export default function SwingCaptureScreen() {
                   phaseSummary ? ` · ${phaseSummary}` : ''
                 }${
                   lastStoredSession
-                    ? ` · 저장 ${lastStoredSession.syncStatus}`
+                    ? ` · 저장 ${lastStoredSession.syncStatus}${
+                        lastStoredSession.lastSyncError
+                          ? ` (${lastStoredSession.lastSyncError})`
+                          : ''
+                      }`
                     : ''
                 }${phaseWarning ? ` · ${phaseWarning}` : ''}`
               : 'Skia 스켈레톤 · 녹화 종료 시 구간 분할·로컬 저장'}

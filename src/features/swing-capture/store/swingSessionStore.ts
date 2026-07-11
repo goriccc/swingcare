@@ -3,7 +3,6 @@
  * 영상 픽셀은 저장하지 않음 — LandmarkFrame[] / PhaseMarker[] 만.
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 import type {
@@ -11,6 +10,7 @@ import type {
   PhaseMarker,
   SwingSession,
 } from '../lib/landmarkTypes';
+import { fileKvStore } from '../../../services/storage/fileKvStore';
 import { upsertSwingSession } from '../../../services/supabase/swingSessions';
 
 const STORAGE_KEY = '@swingcare/swing_sessions_v1';
@@ -38,7 +38,9 @@ function createId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }
-  return `swing_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  // uuid 컬럼용 — 비표준 id면 PostgREST upsert가 실패함
+  const hex = `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`.padEnd(32, '0').slice(0, 32);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
 }
 
 async function readAll(): Promise<StoredSwingSession[]> {
@@ -46,7 +48,7 @@ async function readAll(): Promise<StoredSwingSession[]> {
     return cache;
   }
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    const raw = await fileKvStore.getItem(STORAGE_KEY);
     if (!raw) {
       cache = [];
       return cache;
@@ -61,7 +63,7 @@ async function readAll(): Promise<StoredSwingSession[]> {
 
 async function writeAll(sessions: StoredSwingSession[]): Promise<void> {
   cache = sessions;
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+  await fileKvStore.setItem(STORAGE_KEY, JSON.stringify(sessions));
   emit();
 }
 
@@ -112,7 +114,7 @@ export function buildSwingSession(input: {
   };
 }
 
-/** 로컬 즉시 저장 후 백그라운드 동기화 시도 */
+/** 로컬 즉시 저장 후 동기화까지 기다린 최신 상태 반환 */
 export async function saveSwingSessionLocalFirst(
   session: SwingSession,
 ): Promise<StoredSwingSession> {
@@ -123,8 +125,9 @@ export async function saveSwingSessionLocalFirst(
     lastSyncError: null,
   };
   await writeAll([stored, ...sessions.filter((s) => s.id !== session.id)]);
-  void syncPendingSwingSessions();
-  return stored;
+  await syncPendingSwingSessions();
+  const latest = (await readAll()).find((s) => s.id === session.id);
+  return latest ?? stored;
 }
 
 export async function syncPendingSwingSessions(): Promise<{
@@ -154,6 +157,7 @@ export async function syncPendingSwingSessions(): Promise<{
         lastSyncError: null,
       };
       synced += 1;
+      console.log('[swingSessionStore] synced', item.id);
     } else if (result.reason === 'not_configured') {
       next[i] = {
         ...item,
@@ -161,6 +165,7 @@ export async function syncPendingSwingSessions(): Promise<{
         lastSyncError: result.message,
       };
       skipped += 1;
+      console.warn('[swingSessionStore] sync skipped (not configured)', result.message);
     } else {
       next[i] = {
         ...item,
@@ -168,6 +173,7 @@ export async function syncPendingSwingSessions(): Promise<{
         lastSyncError: result.message,
       };
       failed += 1;
+      console.warn('[swingSessionStore] sync failed', result.reason, result.message);
     }
   }
 

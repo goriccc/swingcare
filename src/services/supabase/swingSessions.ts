@@ -70,7 +70,7 @@ export async function upsertSwingSession(
     return {
       ok: false,
       reason: 'not_configured',
-      message: 'EXPO_PUBLIC_SUPABASE_URL / ANON_KEY 미설정',
+      message: 'EXPO_PUBLIC_SUPABASE_URL / ANON_KEY 미설정 (.env 후 Metro 재시작)',
     };
   }
 
@@ -79,7 +79,7 @@ export async function upsertSwingSession(
     return {
       ok: false,
       reason: 'auth',
-      message: 'anonymous sign-in failed (Dashboard에서 Anonymous 활성화 확인)',
+      message: 'anonymous sign-in failed (Dashboard → Anonymous 활성화 확인)',
     };
   }
 
@@ -98,6 +98,7 @@ export async function upsertSwingSession(
     .upsert(row, { onConflict: 'id' });
 
   if (error) {
+    console.warn('[upsertSwingSession]', error.code, error.message, error.details);
     return { ok: false, reason: 'error', message: error.message };
   }
   return { ok: true, userId };
