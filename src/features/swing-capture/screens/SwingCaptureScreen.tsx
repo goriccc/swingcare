@@ -2,7 +2,7 @@
 
 import { RNMediapipe } from '@thinksys/react-native-mediapipe';
 import * as Device from 'expo-device';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   Platform,
   Pressable,
@@ -21,13 +21,18 @@ import { usePhaseSegmentation } from '../hooks/usePhaseSegmentation';
 import { usePoseLandmarks } from '../hooks/usePoseLandmarks';
 import { useSwingRecorder } from '../hooks/useSwingRecorder';
 import { createEmptyPackedPosePoints } from '../lib/packedPosePoints';
+import {
+  buildSwingSession,
+  saveSwingSessionLocalFirst,
+  type StoredSwingSession,
+} from '../store/swingSessionStore';
 
 /** 탭바 위 녹화 버튼 여백 (iOS만 탭바와 겹침 보정) */
 const RECORD_BUTTON_GAP_IOS = 16;
 const RECORD_BUTTON_BOTTOM_ANDROID = 28;
 
 /**
- * Step 3–5: Skia 스켈레톤 + 녹화 버퍼 + 종료 시 8단계 구간 분할.
+ * Step 3–6: Skia 스켈레톤 + 녹화 + 구간 분할 + 로컬/Supabase 세션 저장.
  * thinksys 네이티브 뼈대 오버레이는 body-part props=false로 끈다.
  *
  * 실기기(Dev Client)에서만 카메라/포즈가 동작한다.
@@ -38,6 +43,9 @@ export default function SwingCaptureScreen() {
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const displayPointsSV = useSharedValue(createEmptyPackedPosePoints());
   const viewSizeRef = useRef({ width: 0, height: 0 });
+  const [lastStoredSession, setLastStoredSession] =
+    useState<StoredSwingSession | null>(null);
+  const [isSavingSession, setIsSavingSession] = useState(false);
 
   const {
     isRecording,
@@ -85,14 +93,38 @@ export default function SwingCaptureScreen() {
   const handleRecordPress = () => {
     if (isRecording) {
       const result = stopRecording();
-      if (result && result.frames.length > 0) {
-        segment(result.frames);
-      } else {
+      if (!result || result.frames.length === 0) {
         clearPhases();
+        setLastStoredSession(null);
+        return;
       }
+
+      const segmentResult = segment(result.frames);
+      const session = buildSwingSession({
+        frames: result.frames,
+        phases: segmentResult.phases,
+        durationMs: result.durationMs,
+      });
+
+      setIsSavingSession(true);
+      void saveSwingSessionLocalFirst(session)
+        .then((stored) => {
+          setLastStoredSession(stored);
+        })
+        .catch(() => {
+          setLastStoredSession({
+            ...session,
+            syncStatus: 'error',
+            lastSyncError: 'local save failed',
+          });
+        })
+        .finally(() => {
+          setIsSavingSession(false);
+        });
       return;
     }
     clearPhases();
+    setLastStoredSession(null);
     startRecording();
   };
 
@@ -158,11 +190,17 @@ export default function SwingCaptureScreen() {
           vis {averageVisibility.toFixed(2)}
         </Text>
         <Text style={styles.statusSub}>
-          {lastResult
-            ? `직전 녹화: ${lastResult.frames.length}프레임 / ${lastResult.durationMs}ms${
-                phaseSummary ? ` · ${phaseSummary}` : ''
-              }${phaseWarning ? ` · ${phaseWarning}` : ''}`
-            : 'Skia 스켈레톤 · 녹화 종료 시 8단계 구간 분할'}
+          {isSavingSession
+            ? '세션 저장 중…'
+            : lastResult
+              ? `직전 녹화: ${lastResult.frames.length}프레임 / ${lastResult.durationMs}ms${
+                  phaseSummary ? ` · ${phaseSummary}` : ''
+                }${
+                  lastStoredSession
+                    ? ` · 저장 ${lastStoredSession.syncStatus}`
+                    : ''
+                }${phaseWarning ? ` · ${phaseWarning}` : ''}`
+              : 'Skia 스켈레톤 · 녹화 종료 시 구간 분할·로컬 저장'}
         </Text>
       </View>
 
