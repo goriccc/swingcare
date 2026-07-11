@@ -103,6 +103,8 @@ export interface PhaseMarker {
 /** 로컬/원격에 저장하는 스윙 세션 (랜드마크 좌표만, 영상 픽셀 미포함) */
 export interface SwingSession {
   id: string;
+  /** Supabase auth.users.id (익명 로그인 포함). 로컬만 있을 때는 null */
+  userId: string | null;
   createdAt: string;
   frames: LandmarkFrame[];
   phases: PhaseMarker[];

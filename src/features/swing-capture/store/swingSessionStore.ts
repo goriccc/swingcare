@@ -103,6 +103,7 @@ export function buildSwingSession(input: {
 
   return {
     id: createId(),
+    userId: null,
     createdAt: new Date().toISOString(),
     frames: input.frames,
     phases: input.phases,
@@ -148,6 +149,7 @@ export async function syncPendingSwingSessions(): Promise<{
     if (result.ok) {
       next[i] = {
         ...item,
+        userId: result.userId,
         syncStatus: 'synced',
         lastSyncError: null,
       };

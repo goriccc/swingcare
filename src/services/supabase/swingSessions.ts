@@ -1,7 +1,6 @@
 /**
  * Supabase swing_sessions 테이블 read/write.
- * 기존 연운·파나나 스키마가 프로젝트에 없어 5.4절 기준으로 신규 설계함.
- * (다른 컨벤션이 있으면 맞춰 수정할 것)
+ * RLS: authenticated + auth.uid() = user_id (익명 로그인 포함).
  */
 
 import type {
@@ -10,11 +9,16 @@ import type {
   SwingSession,
 } from '../../features/swing-capture/lib/landmarkTypes';
 
-import { getSupabaseClient, isSupabaseConfigured } from './client';
+import {
+  ensureAnonymousUserId,
+  getSupabaseClient,
+  isSupabaseConfigured,
+} from './client';
 
 /** DB row ↔ SwingSession 매핑 */
 export interface SwingSessionRow {
   id: string;
+  user_id: string;
   created_at: string;
   duration_ms: number;
   platform: 'ios' | 'android';
@@ -24,8 +28,12 @@ export interface SwingSessionRow {
 }
 
 export function toSwingSessionRow(session: SwingSession): SwingSessionRow {
+  if (!session.userId) {
+    throw new Error('SwingSession.userId is required for remote upsert');
+  }
   return {
     id: session.id,
+    user_id: session.userId,
     created_at: session.createdAt,
     duration_ms: session.durationMs,
     platform: session.deviceInfo.platform,
@@ -38,6 +46,7 @@ export function toSwingSessionRow(session: SwingSession): SwingSessionRow {
 export function fromSwingSessionRow(row: SwingSessionRow): SwingSession {
   return {
     id: row.id,
+    userId: row.user_id,
     createdAt: row.created_at,
     durationMs: row.duration_ms,
     frames: row.frames,
@@ -50,10 +59,10 @@ export function fromSwingSessionRow(row: SwingSessionRow): SwingSession {
 }
 
 export type UpsertSwingSessionResult =
-  | { ok: true }
-  | { ok: false; reason: 'not_configured' | 'error'; message: string };
+  | { ok: true; userId: string }
+  | { ok: false; reason: 'not_configured' | 'auth' | 'error'; message: string };
 
-/** 세션 upsert (좌표 JSON만, 영상 없음) */
+/** 세션 upsert (좌표 JSON만, 영상 없음). 익명 로그인 후 user_id 포함. */
 export async function upsertSwingSession(
   session: SwingSession,
 ): Promise<UpsertSwingSessionResult> {
@@ -62,6 +71,15 @@ export async function upsertSwingSession(
       ok: false,
       reason: 'not_configured',
       message: 'EXPO_PUBLIC_SUPABASE_URL / ANON_KEY 미설정',
+    };
+  }
+
+  const userId = session.userId ?? (await ensureAnonymousUserId());
+  if (!userId) {
+    return {
+      ok: false,
+      reason: 'auth',
+      message: 'anonymous sign-in failed (Dashboard에서 Anonymous 활성화 확인)',
     };
   }
 
@@ -74,14 +92,15 @@ export async function upsertSwingSession(
     };
   }
 
+  const row = toSwingSessionRow({ ...session, userId });
   const { error } = await supabase
     .from('swing_sessions')
-    .upsert(toSwingSessionRow(session), { onConflict: 'id' });
+    .upsert(row, { onConflict: 'id' });
 
   if (error) {
     return { ok: false, reason: 'error', message: error.message };
   }
-  return { ok: true };
+  return { ok: true, userId };
 }
 
 export async function listRemoteSwingSessions(
@@ -91,6 +110,8 @@ export async function listRemoteSwingSessions(
   if (!supabase) {
     return [];
   }
+
+  await ensureAnonymousUserId();
 
   const { data, error } = await supabase
     .from('swing_sessions')
