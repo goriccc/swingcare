@@ -4,6 +4,7 @@
 Dev Client 안의 MediaPipe Pose Landmarker로 분석한다.
 
 - iOS/Android에서 15fps로 균일 샘플링한다(최대 30fps 허용).
+- MediaPipe 추론 전 프레임의 종횡비를 유지하면서 긴 변을 최대 720px로 축소한다.
 - 각 프레임은 BlazePose 33개 좌표로 저장하며, 미검출 프레임은 0 좌표로 유지한다.
 - 앱에서 구간 분할, `load_score_v2`, 이동 지표, 진단을 계산한다.
 - 영상과 `frames`, `phases`, `swing_reports`를 Supabase에 저장한 뒤 세션을

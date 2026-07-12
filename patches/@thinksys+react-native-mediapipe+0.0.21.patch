@@ -10,6 +10,17 @@ index eb884a5..8e17ce0 100644
  
    // WindowManager
    implementation 'androidx.window:window:1.1.0'
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/05bd5028d7b2b91e1a1299529153b97d/results.bin b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/05bd5028d7b2b91e1a1299529153b97d/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/05bd5028d7b2b91e1a1299529153b97d/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/05bd5028d7b2b91e1a1299529153b97d/transformed/classes/classes_dex/classes.dex b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/05bd5028d7b2b91e1a1299529153b97d/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..32e8b59
+Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/05bd5028d7b2b91e1a1299529153b97d/transformed/classes/classes_dex/classes.dex differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/70de2a58e9ca19398cf0f5846f427b01/results.bin b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/70de2a58e9ca19398cf0f5846f427b01/results.bin
 new file mode 100644
 index 0000000..0d259dd
@@ -21,6 +32,17 @@ diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/.transf
 new file mode 100644
 index 0000000..d3b27e2
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/70de2a58e9ca19398cf0f5846f427b01/transformed/classes/classes_dex/classes.dex differ
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/dd2b87985fd597e9b20db3442664b89b/results.bin b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/dd2b87985fd597e9b20db3442664b89b/results.bin
+new file mode 100644
+index 0000000..0d259dd
+--- /dev/null
++++ b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/dd2b87985fd597e9b20db3442664b89b/results.bin
+@@ -0,0 +1 @@
++o/classes
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/dd2b87985fd597e9b20db3442664b89b/transformed/classes/classes_dex/classes.dex b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/dd2b87985fd597e9b20db3442664b89b/transformed/classes/classes_dex/classes.dex
+new file mode 100644
+index 0000000..e2936ce
+Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/.transforms/dd2b87985fd597e9b20db3442664b89b/transformed/classes/classes_dex/classes.dex differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/generated/data_binding_base_class_source_out/debug/out/com/tsmediapipe/databinding/ActivityMainBinding.java b/node_modules/@thinksys/react-native-mediapipe/android/build/generated/data_binding_base_class_source_out/debug/out/com/tsmediapipe/databinding/ActivityMainBinding.java
 new file mode 100644
 index 0000000..02952b4
@@ -660,7 +682,7 @@ index 0000000..300a181
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/assets/debug/mergeDebugAssets/pose_landmarker_full.task differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar
 new file mode 100644
-index 0000000..0622c55
+index 0000000..66caddb
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/compile_library_classes_jar/debug/bundleLibCompileToJarDebug/classes.jar differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/compile_r_class_jar/debug/generateDebugRFile/R.jar
 new file mode 100644
@@ -1094,11 +1116,11 @@ index 0000000..797e2e6
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/GlobalState.class differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/MediaPipeNativeModule$1.class b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/MediaPipeNativeModule$1.class
 new file mode 100644
-index 0000000..4bd2e46
+index 0000000..3256f12
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/MediaPipeNativeModule$1.class differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/MediaPipeNativeModule.class b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/MediaPipeNativeModule.class
 new file mode 100644
-index 0000000..e987b2a
+index 0000000..e71a9ba
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/MediaPipeNativeModule.class differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/TsMediapipePackage.class b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes/com/tsmediapipe/TsMediapipePackage.class
 new file mode 100644
@@ -1550,7 +1572,7 @@ index 0000000..646b484
 \ No newline at end of file
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar
 new file mode 100644
-index 0000000..3719cc8
+index 0000000..1b18746
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/runtime_library_classes_jar/debug/bundleLibRuntimeToJarDebug/classes.jar differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt b/node_modules/@thinksys/react-native-mediapipe/android/build/intermediates/symbol_list_with_package_name/debug/generateDebugRFile/package-aware-r.txt
 new file mode 100644
@@ -1998,7 +2020,7 @@ index 0000000..131e265
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/cacheable/caches-jvm/lookups/lookups.tab_i.len differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin b/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin
 new file mode 100644
-index 0000000..2392ae2
+index 0000000..42ebbeb
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/cacheable/last-build.bin differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin b/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin
 new file mode 100644
@@ -2006,7 +2028,7 @@ index 0000000..26c1af8
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/classpath-snapshot/shrunk-classpath-snapshot.bin differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin b/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin
 new file mode 100644
-index 0000000..7f6f5b7
+index 0000000..6fe6044
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/kotlin/compileDebugKotlin/local-state/build-history.bin differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/outputs/logs/manifest-merger-debug-report.txt b/node_modules/@thinksys/react-native-mediapipe/android/build/outputs/logs/manifest-merger-debug-report.txt
 new file mode 100644
@@ -2030,9 +2052,21 @@ index 0000000..43678d1
 +		INJECTED from /Users/songjunho/SwingCare/node_modules/@thinksys/react-native-mediapipe/android/src/main/AndroidManifestNew.xml
 +	android:minSdkVersion
 +		INJECTED from /Users/songjunho/SwingCare/node_modules/@thinksys/react-native-mediapipe/android/src/main/AndroidManifestNew.xml
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaPipeNativeModule$1.class.uniqueId2 b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaPipeNativeModule$1.class.uniqueId2
+new file mode 100644
+index 0000000..4bd2e46
+Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaPipeNativeModule$1.class.uniqueId2 differ
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaPipeNativeModule.class.uniqueId0 b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaPipeNativeModule.class.uniqueId0
+new file mode 100644
+index 0000000..0acd457
+Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/MediaPipeNativeModule.class.uniqueId0 differ
+diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/TsMediapipePackage.class.uniqueId1 b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/TsMediapipePackage.class.uniqueId1
+new file mode 100644
+index 0000000..5b18e5b
+Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/compileTransaction/stash-dir/TsMediapipePackage.class.uniqueId1 differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin
 new file mode 100644
-index 0000000..7c56153
+index 0000000..6510192
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/compileDebugJavaWithJavac/previous-compilation-data.bin differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/kotlin-classes/debug/META-INF/thinksys_react-native-mediapipe_debug.kotlin_module b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/kotlin-classes/debug/META-INF/thinksys_react-native-mediapipe_debug.kotlin_module
 new file mode 100644
@@ -2119,15 +2153,16 @@ new file mode 100644
 index 0000000..ef8b390
 Binary files /dev/null and b/node_modules/@thinksys/react-native-mediapipe/android/build/tmp/kotlin-classes/debug/com/tsmediapipe/fragment/PermissionsFragmentKt.class differ
 diff --git a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/MediaPipeNativeModule.java b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/MediaPipeNativeModule.java
-index df38cc4..66b35c2 100644
+index df38cc4..ef5ce10 100644
 --- a/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/MediaPipeNativeModule.java
 +++ b/node_modules/@thinksys/react-native-mediapipe/android/src/main/java/com/tsmediapipe/MediaPipeNativeModule.java
-@@ -1,14 +1,37 @@
+@@ -1,14 +1,39 @@
  package com.tsmediapipe;
  
 +import android.graphics.Bitmap;
 +import android.media.MediaMetadataRetriever;
 +import android.net.Uri;
++import android.os.Build;
 +import android.os.SystemClock;
  import android.util.Log;
  
@@ -2154,13 +2189,14 @@ index df38cc4..66b35c2 100644
  public class MediaPipeNativeModule extends ReactContextBaseJavaModule {
 +  private static final double DEFAULT_VIDEO_FPS = 15.0;
 +  private static final double MAX_VIDEO_FPS = 30.0;
++  private static final int VIDEO_FRAME_LONG_EDGE_PX = 720;
 +  private static final long MAX_VIDEO_DURATION_MS = 30_000L;
 +  private static final long VIDEO_ANALYSIS_TIMEOUT_MS = 85_000L;
 +  private final ExecutorService videoExecutor = Executors.newSingleThreadExecutor();
  
    public MediaPipeNativeModule(ReactApplicationContext reactContext) {
      super(reactContext);
-@@ -37,4 +60,181 @@ public class MediaPipeNativeModule extends ReactContextBaseJavaModule {
+@@ -37,4 +62,259 @@ public class MediaPipeNativeModule extends ReactContextBaseJavaModule {
        Log.e("switchCameraMethod", "CameraFragment is not initialized");
      }
    }
@@ -2219,6 +2255,13 @@ index df38cc4..66b35c2 100644
 +        if (durationMs > MAX_VIDEO_DURATION_MS) {
 +          throw new IllegalArgumentException("Video must be 30 seconds or shorter");
 +        }
++        int sourceWidth = parsePositiveMetadata(
++          retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)
++        );
++        int sourceHeight = parsePositiveMetadata(
++          retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)
++        );
++        int[] targetSize = scaledSize(sourceWidth, sourceHeight);
 +
 +        helper = new PoseLandmarkerHelper(
 +          0.5f,
@@ -2251,9 +2294,11 @@ index df38cc4..66b35c2 100644
 +            );
 +          }
 +          long timestampMs = Math.min(durationMs, index * intervalMs);
-+          Bitmap bitmap = retriever.getFrameAtTime(
++          Bitmap bitmap = getScaledFrameAtTime(
++            retriever,
 +            timestampMs * 1000L,
-+            MediaMetadataRetriever.OPTION_CLOSEST
++            targetSize[0],
++            targetSize[1]
 +          );
 +          List<NormalizedLandmark> landmarks = Collections.emptyList();
 +          if (bitmap != null) {
@@ -2307,6 +2352,75 @@ index df38cc4..66b35c2 100644
 +        }
 +      }
 +    });
++  }
++
++  private int parsePositiveMetadata(String value) {
++    if (value == null) {
++      return 0;
++    }
++    try {
++      return Math.max(0, Integer.parseInt(value));
++    } catch (NumberFormatException ignored) {
++      return 0;
++    }
++  }
++
++  private int[] scaledSize(int width, int height) {
++    if (width <= 0 || height <= 0) {
++      return new int[] { 0, 0 };
++    }
++    double scale = Math.min(
++      1.0,
++      (double) VIDEO_FRAME_LONG_EDGE_PX / Math.max(width, height)
++    );
++    return new int[] {
++      Math.max(1, (int) Math.round(width * scale)),
++      Math.max(1, (int) Math.round(height * scale))
++    };
++  }
++
++  private Bitmap getScaledFrameAtTime(
++    MediaMetadataRetriever retriever,
++    long timestampUs,
++    int targetWidth,
++    int targetHeight
++  ) {
++    if (
++      Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 &&
++      targetWidth > 0 &&
++      targetHeight > 0
++    ) {
++      return retriever.getScaledFrameAtTime(
++        timestampUs,
++        MediaMetadataRetriever.OPTION_CLOSEST,
++        targetWidth,
++        targetHeight
++      );
++    }
++    Bitmap source = retriever.getFrameAtTime(
++      timestampUs,
++      MediaMetadataRetriever.OPTION_CLOSEST
++    );
++    if (source == null) {
++      return source;
++    }
++    int maxWidth = targetWidth > 0 ? targetWidth : VIDEO_FRAME_LONG_EDGE_PX;
++    int maxHeight = targetHeight > 0 ? targetHeight : VIDEO_FRAME_LONG_EDGE_PX;
++    if (source.getWidth() <= maxWidth && source.getHeight() <= maxHeight) {
++      return source;
++    }
++    double scale = Math.min(
++      (double) maxWidth / source.getWidth(),
++      (double) maxHeight / source.getHeight()
++    );
++    Bitmap scaled = Bitmap.createScaledBitmap(
++      source,
++      Math.max(1, (int) Math.round(source.getWidth() * scale)),
++      Math.max(1, (int) Math.round(source.getHeight() * scale)),
++      true
++    );
++    source.recycle();
++    return scaled;
 +  }
 +
 +  private WritableMap createFrame(
@@ -2619,10 +2733,18 @@ index 7c21b4a..054e66a 100644
      }
  }
 diff --git a/node_modules/@thinksys/react-native-mediapipe/ios/Services/PoseLandmarkerService.swift b/node_modules/@thinksys/react-native-mediapipe/ios/Services/PoseLandmarkerService.swift
-index c5d3ab2..65735fa 100644
+index c5d3ab2..2a319fd 100644
 --- a/node_modules/@thinksys/react-native-mediapipe/ios/Services/PoseLandmarkerService.swift
 +++ b/node_modules/@thinksys/react-native-mediapipe/ios/Services/PoseLandmarkerService.swift
-@@ -175,11 +175,15 @@ class PoseLandmarkerService: NSObject {
+@@ -24,6 +24,7 @@ protocol PoseLandmarkerServiceVideoDelegate: AnyObject {
+ 
+ // Initializes and calls the MediaPipe APIs for detection.
+ class PoseLandmarkerService: NSObject {
++    private static let videoFrameLongEdge: CGFloat = 720
+ 
+     weak var liveStreamDelegate: PoseLandmarkerServiceLiveStreamDelegate?
+     weak var videoDelegate: PoseLandmarkerServiceVideoDelegate?
+@@ -175,11 +176,15 @@ class PoseLandmarkerService: NSObject {
      func detect(
          videoAsset: AVAsset,
          durationInMilliseconds: Double,
@@ -2640,7 +2762,7 @@ index c5d3ab2..65735fa 100644
              Task { @MainActor in
                  videoDelegate?.poseLandmarkerService(self, willBeginDetection: frameCount)
              }
-@@ -187,7 +191,8 @@ class PoseLandmarkerService: NSObject {
+@@ -187,7 +192,8 @@ class PoseLandmarkerService: NSObject {
              let poseLandmarkerResultTuple = detectPoseLandmarksInFramesGenerated(
                  by: assetGenerator,
                  totalFrameCount: frameCount,
@@ -2650,7 +2772,18 @@ index c5d3ab2..65735fa 100644
              
              return ResultBundle(
                  inferenceTime: Date().timeIntervalSince(startDate) / Double(frameCount) * 1000,
-@@ -207,7 +212,8 @@ class PoseLandmarkerService: NSObject {
+@@ -200,6 +206,10 @@ class PoseLandmarkerService: NSObject {
+         generator.requestedTimeToleranceBefore = CMTimeMake(value: 1, timescale: 25)
+         generator.requestedTimeToleranceAfter = CMTimeMake(value: 1, timescale: 25)
+         generator.appliesPreferredTrackTransform = true
++        generator.maximumSize = CGSize(
++            width: Self.videoFrameLongEdge,
++            height: Self.videoFrameLongEdge
++        )
+ 
+         return generator
+     }
+@@ -207,7 +217,8 @@ class PoseLandmarkerService: NSObject {
      private func detectPoseLandmarksInFramesGenerated(
          by assetGenerator: AVAssetImageGenerator,
          totalFrameCount frameCount: Int,
@@ -2660,7 +2793,7 @@ index c5d3ab2..65735fa 100644
      -> (poseLandmarkerResults: [PoseLandmarkerResult?], videoSize: CGSize)  {
          var poseLandmarkerResults: [PoseLandmarkerResult?] = []
          var videoSize = CGSize.zero
-@@ -234,6 +240,7 @@ class PoseLandmarkerService: NSObject {
+@@ -234,6 +245,7 @@ class PoseLandmarkerService: NSObject {
                  Task { @MainActor in
                      videoDelegate?.poseLandmarkerService(self, didFinishDetectionOnVideoFrame: i)
                  }

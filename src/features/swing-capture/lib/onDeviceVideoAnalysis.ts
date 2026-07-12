@@ -1,6 +1,9 @@
 import { extractPoseFromVideo } from '@thinksys/react-native-mediapipe';
-import { Platform } from 'react-native';
 
+import {
+  getAnalysisFps,
+  normalizeAnalysisFps,
+} from './analysisFpsSetting';
 import { segmentSwingPhases } from './phaseSegmentation';
 import type { LandmarkFrame, PhaseMarker } from './landmarkTypes';
 import {
@@ -9,9 +12,6 @@ import {
 } from './scoring/balanceScore';
 import { matchDiagnosis } from './scoring/diagnosisTemplates';
 
-// Android MediaMetadataRetriever의 임의 프레임 탐색은 고해상도 영상에서 매우
-// 느리므로 자세 점수에 충분한 5fps로 제한한다. iOS는 AVAsset 기반 15fps를 유지한다.
-const DEFAULT_EXTRACT_FPS = Platform.OS === 'android' ? 5 : 15;
 const LANDMARK_COUNT = 33;
 const VIDEO_ANALYSIS_TIMEOUT_MS = 90_000;
 
@@ -91,21 +91,35 @@ export async function analyzeVideoOnDevice(input: {
   fps?: number;
   onProgress?: (progress: OnDeviceAnalysisProgress) => void;
 }): Promise<OnDeviceVideoAnalysis> {
+  const analysisFps =
+    input.fps == null
+      ? await getAnalysisFps()
+      : normalizeAnalysisFps(input.fps);
   let extracted: Awaited<ReturnType<typeof extractPoseFromVideo>>;
   let lastReportedPercent = -1;
+  let lastReportedStatus = '';
+  let nativeProgressIsFlowing = false;
   const report = (percent: number, status: string) => {
     if (!Number.isFinite(percent)) {
       return;
     }
-    const safePercent = Math.round(Math.max(0, Math.min(100, percent)));
-    if (safePercent === lastReportedPercent) {
+    const safePercent = Math.max(
+      lastReportedPercent,
+      Math.round(Math.max(0, Math.min(100, percent))),
+    );
+    if (
+      safePercent === lastReportedPercent &&
+      status === lastReportedStatus
+    ) {
       return;
     }
     lastReportedPercent = safePercent;
+    lastReportedStatus = status;
     input.onProgress?.({ percent: safePercent, status });
   };
 
-  // Native progress may be missing on older builds; keep UI alive safely.
+  // Native progress may be missing on older builds. Staged progress is only a
+  // fallback until the first valid native event; afterwards native owns this phase.
   const stagedTimers = [
     { delayMs: 1200, percent: 12, status: '영상 분석 중' },
     { delayMs: 3500, percent: 35, status: '영상 분석 중' },
@@ -113,7 +127,7 @@ export async function analyzeVideoOnDevice(input: {
     { delayMs: 12000, percent: 72, status: '영상 분석 중' },
   ].map(({ delayMs, percent, status }) =>
     setTimeout(() => {
-      if (lastReportedPercent < percent) {
+      if (!nativeProgressIsFlowing && lastReportedPercent < percent) {
         report(percent, status);
       }
     }, delayMs),
@@ -123,15 +137,16 @@ export async function analyzeVideoOnDevice(input: {
     report(3, '프레임 추출 준비 중');
     extracted = await extractWithTimeout({
       uri: input.uri,
-      fps: input.fps ?? DEFAULT_EXTRACT_FPS,
+      fps: analysisFps,
     }, (nativeProgress) => {
       const rawRatio = (nativeProgress as { progress?: unknown } | null)
         ?.progress;
       if (!isFiniteNumber(rawRatio)) {
         return;
       }
+      nativeProgressIsFlowing = true;
       const ratio = Math.max(0, Math.min(1, rawRatio));
-      report(5 + ratio * 80, '영상 분석 중');
+      report(5 + ratio * 85, '영상 분석 중');
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -155,17 +170,19 @@ export async function analyzeVideoOnDevice(input: {
     }
   }
 
-  report(88, '스윙 구간 찾는 중');
+  report(92, '스윙 구간 찾는 중');
   const frames = validateFrames(extracted.frames);
   const phases = segmentSwingPhases(frames).phases;
-  report(93, '점수 계산 중');
+  report(95, '점수 계산 중');
   const balanceScore = computeBalanceScore(frames, phases);
   const diagnosis = matchDiagnosis(balanceScore, phases);
 
   return {
     frames,
     phases,
-    fps: isFiniteNumber(extracted.fps) ? extracted.fps : DEFAULT_EXTRACT_FPS,
+    fps: isFiniteNumber(extracted.fps)
+      ? extracted.fps
+      : analysisFps,
     durationMs: isFiniteNumber(extracted.durationMs)
       ? extracted.durationMs
       : input.expectedDurationMs,

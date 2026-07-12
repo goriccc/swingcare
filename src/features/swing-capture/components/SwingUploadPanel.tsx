@@ -5,6 +5,7 @@
  * → 기본은 expo-image-picker(사진 라이브러리), 보조는 File.pickFileAsync(파일 앱).
  */
 
+import AnalysisFpsSlider from '@expo/ui/community/slider';
 import { File, type PickSingleFileResult } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
@@ -29,6 +30,14 @@ import {
   analyzeVideoOnDevice,
   type OnDeviceAnalysisProgress,
 } from '../lib/onDeviceVideoAnalysis';
+import {
+  DEFAULT_ANALYSIS_FPS,
+  getAnalysisFps,
+  MAX_ANALYSIS_FPS,
+  MIN_ANALYSIS_FPS,
+  normalizeAnalysisFps,
+  setAnalysisFps as persistAnalysisFps,
+} from '../lib/analysisFpsSetting';
 
 const MAX_BYTES = 200 * 1024 * 1024;
 const MAX_DURATION_MS = 30_000;
@@ -212,12 +221,44 @@ async function fetchRecentAnalysisState(sessionId: string): Promise<{
 export default function SwingUploadPanel({ bottomInset }: Props) {
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [analysisFps, setAnalysisFps] = useState(DEFAULT_ANALYSIS_FPS);
   const [analysisProgress, setAnalysisProgress] =
     useState<OnDeviceAnalysisProgress | null>(null);
   const [recent, setRecent] = useState<RecentItem[]>([]);
   const recentRef = useRef(recent);
+  const maxPercentRef = useRef(0);
   recentRef.current = recent;
   const displayedProgress = normalizeAnalysisProgress(analysisProgress);
+
+  useEffect(() => {
+    void getAnalysisFps().then(setAnalysisFps);
+  }, []);
+
+  const handleAnalysisFpsChange = useCallback((value: number) => {
+    const next = normalizeAnalysisFps(value);
+    setAnalysisFps(next);
+    void persistAnalysisFps(next).catch((error) => {
+      console.warn('[SwingUploadPanel] analysis fps', error);
+    });
+  }, []);
+
+  const updateAnalysisProgress = useCallback((value: unknown) => {
+    const next = normalizeAnalysisProgress(value);
+    if (!next) {
+      return;
+    }
+    setAnalysisProgress((previous) => {
+      const previousPercent =
+        normalizeAnalysisProgress(previous)?.percent ?? 0;
+      const percent = Math.max(
+        maxPercentRef.current,
+        previousPercent,
+        next.percent,
+      );
+      maxPercentRef.current = percent;
+      return { ...next, percent };
+    });
+  }, []);
 
   const refreshAnalyzingItems = useCallback(async () => {
     const analyzing = recentRef.current.filter(
@@ -300,19 +341,23 @@ export default function SwingUploadPanel({ bottomInset }: Props) {
 
     try {
       setStatus(null);
-      setAnalysisProgress({ percent: 3, status: '프레임 추출 준비 중' });
+      maxPercentRef.current = 0;
+      updateAnalysisProgress({
+        percent: 3,
+        status: '프레임 추출 준비 중',
+      });
       const analysis = await analyzeVideoOnDevice({
         uri: picked.uri,
         expectedDurationMs: durationMs,
         onProgress: (progress) => {
-          const safeProgress = normalizeAnalysisProgress(progress);
-          if (safeProgress) {
-            setAnalysisProgress(safeProgress);
-          }
+          updateAnalysisProgress(progress);
         },
       });
 
-      setAnalysisProgress({ percent: 96, status: '영상과 리포트 업로드 중' });
+      updateAnalysisProgress({
+        percent: 98,
+        status: '영상과 리포트 업로드 중',
+      });
       const uploaded = await uploadSwingVideoAndCreateSession({
         localUri: picked.uri,
         fileName: picked.fileName,
@@ -329,7 +374,10 @@ export default function SwingUploadPanel({ bottomInset }: Props) {
         return;
       }
 
-      setAnalysisProgress(null);
+      updateAnalysisProgress({ percent: 100, status: '분석 완료' });
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 250);
+      });
       setStatus(
         `분석 완료 · ${analysis.frames.length}프레임 · 종합 ${Math.round(analysis.balanceScore.overallScore)}점`,
       );
@@ -478,6 +526,26 @@ export default function SwingUploadPanel({ bottomInset }: Props) {
   return (
     <View style={[styles.root, { paddingBottom: bottomInset + 24 }]}>
       <View style={styles.dropzone}>
+        <View style={styles.analysisBlock}>
+          <View style={styles.analysisHeader}>
+            <Text style={styles.analysisTitle}>분석 품질</Text>
+            <Text style={styles.analysisValue}>{analysisFps}fps</Text>
+          </View>
+          <AnalysisFpsSlider
+            accessibilityLabel="분석 품질"
+            minimumValue={MIN_ANALYSIS_FPS}
+            maximumValue={MAX_ANALYSIS_FPS}
+            step={1}
+            value={analysisFps}
+            onValueChange={handleAnalysisFpsChange}
+            minimumTrackTintColor="#2F6BFF"
+            style={styles.analysisSlider}
+          />
+          <View style={styles.analysisRange}>
+            <Text style={styles.analysisRangeText}>{MIN_ANALYSIS_FPS}fps</Text>
+            <Text style={styles.analysisRangeText}>{MAX_ANALYSIS_FPS}fps</Text>
+          </View>
+        </View>
         <Text style={styles.dropTitle}>영상을 선택하세요</Text>
         <Text style={styles.dropMeta}>
           {
@@ -502,21 +570,6 @@ export default function SwingUploadPanel({ bottomInset }: Props) {
           ) : (
             <Text style={styles.primaryBtnText}>사진에서 선택</Text>
           )}
-        </Pressable>
-
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="파일에서 선택"
-          disabled={uploading}
-          onPress={() => {
-            void pickFromFiles();
-          }}
-          style={({ pressed }) => [
-            styles.secondaryBtn,
-            (pressed || uploading) && styles.pressed,
-          ]}
-        >
-          <Text style={styles.secondaryBtnText}>파일에서 선택</Text>
         </Pressable>
 
         {displayedProgress ? (
@@ -609,6 +662,35 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.55)',
     alignItems: 'center',
     gap: 10,
+  },
+  analysisBlock: {
+    alignSelf: 'stretch',
+    marginBottom: 8,
+  },
+  analysisHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  analysisTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#232630',
+  },
+  analysisValue: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#2F6BFF',
+  },
+  analysisSlider: { height: 40, marginTop: 4 },
+  analysisRange: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  analysisRangeText: {
+    fontSize: 10.5,
+    fontWeight: '600',
+    color: '#9AA1B5',
   },
   dropTitle: {
     fontSize: 15,
