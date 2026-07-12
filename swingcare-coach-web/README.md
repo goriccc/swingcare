@@ -13,18 +13,30 @@ npm run dev
 
 기본: http://localhost:3000 → `/coach/login`
 
-## 코치 계정 준비
+## Vercel 배포 (중요)
 
-1. Supabase Auth에서 코치 유저 생성
-2. `public.users.role = 'coach'` (service role로 업데이트)
-3. `public.coaches.auth_user_id` 에 해당 Auth UID 연결
+모노레포이므로 **Root Directory** 를 반드시 지정해야 합니다.
+미설정 시 Expo 루트가 배포되어 `404: NOT_FOUND` 가 납니다.
+
+1. Vercel 프로젝트 → **Settings → General → Root Directory**
+2. **Edit** → `swingcare-coach-web` 입력 → Save
+3. Framework Preset: **Next.js** (자동 감지)
+4. Install / Build / Output: 기본값 유지 (Override 끄기)
+5. **Settings → Environment Variables**
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+6. **Deployments → Redeploy** (또는 main에 푸시)
+
+## 코치 계정
+
+- 아이디: `swingmaster` (도메인 자동 부착)
+- Auth 이메일: `swingmaster@swingcare.app`
+- `users.role = coach` + `coaches.auth_user_id` 연결 필요
 
 ## 라우트
 
 | 경로 | 설명 |
 |------|------|
-| `/coach/login` | 이메일/비밀번호 로그인 + role 게이트 |
-| `/coach/requests` | 인박스 (pending / accepted / in_review / completed) |
-| `/coach/requests/[id]` | 클립 재생(서명 URL) + 회신·상태 변경 |
-
-클립은 Storage RLS상 배정 코치만 `createSignedUrl` 가능합니다. Express 재사용은 필요 없습니다.
+| `/coach/login` | 로그인 |
+| `/coach/requests` | 인박스 |
+| `/coach/requests/[id]` | 클립 + 회신 |
